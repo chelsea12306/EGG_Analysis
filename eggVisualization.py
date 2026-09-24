@@ -1,13 +1,13 @@
 """
-eggVisualization.py - 可视化模块
+eggVisualization.py - Visualization module
 
-绘制以下图表：
-  1. EGG 原始信号 vs 滤波后信号（以 ID1 为例）
-  2. FFT 功率谱 + 主频标注
-  3. 全体受试者空腹 vs 餐后主频柱状图
-  4. t 检验结果汇总表
+Plots the following figures:
+  1. EGG raw signal vs filtered signal (using ID1 as an example)
+  2. FFT power spectrum with dominant frequency annotation
+  3. Bar chart of fasting vs postprandial dominant frequency for all subjects
+  4. Summary table of t-test results
 
-依赖：matplotlib（Google Colab 预装）
+Dependency: matplotlib (pre-installed in Google Colab)
 """
 
 import numpy as np
@@ -22,9 +22,9 @@ DATA_DIR = 'EGG-database'
 
 b, a = sig.butter(3, [0.03, 0.25], btype='bandpass', fs=fs)
 
-# ==================== 图1: 原始信号 vs 滤波后 ====================
+# ==================== Figure 1: Raw signal vs filtered signal ====================
 dat = np.loadtxt(os.path.join(DATA_DIR, 'ID1_fasting.txt'))
-t = np.arange(2400) / fs  # 时间轴（秒）
+t = np.arange(2400) / fs  # Time axis (seconds)
 
 raw_ch1 = dat[:2400, 0]
 filt_ch1 = sig.filtfilt(b, a, raw_ch1)
@@ -46,10 +46,10 @@ plt.savefig('fig1_signal.png', dpi=150)
 plt.show()
 print('Figure 1 saved: fig1_signal.png')
 
-# ==================== 图2: FFT 功率谱 ====================
+# ==================== Figure 2: FFT power spectrum ====================
 fft_power = np.abs(np.fft.fft(filt_ch1, N))**2
 fft_half = fft_power[:N//2 + 1]
-freqs = np.arange(len(fft_half)) / 2048 * 60  # 转换为 cpm
+freqs = np.arange(len(fft_half)) / 2048 * 60  # Convert to cpm
 peak_idx = np.argmax(fft_half)
 peak_cpm = (peak_idx + 1) / 2048 * 60
 
@@ -67,8 +67,8 @@ plt.savefig('fig2_fft.png', dpi=150)
 plt.show()
 print(f'Figure 2 saved: fig2_fft.png  (DF = {peak_cpm:.2f} cpm)')
 
-# ==================== 图3: 全体 DF 柱状图 ====================
-# 先重新计算 DF（复用 eggAnalysis.py 的逻辑）
+# ==================== Figure 3: Bar chart of dominant frequency for all subjects ====================
+# Recompute DF first (reusing the logic from eggAnalysis.py)
 df = np.zeros((20, 6))
 for ind in range(1, 21):
     dat_f = np.loadtxt(os.path.join(DATA_DIR, f'ID{ind}_fasting.txt'))
@@ -82,13 +82,13 @@ for ind in range(1, 21):
         df[ind-1, ch+3] = (np.argmax(fp) + 1) / 2048
 df = df * 60
 
-# 手动修正
+# Manual correction
 df[3, 3] = 3.1934; df[3, 4] = 3.1348; df[3, 5] = 3.1348
 df[5, 2] = 2.4900
 df[14, 3] = 2.2560
 df[16, 0] = 2.9592; df[16, 1] = 3.0469; df[16, 2] = 3.0762
 
-# 绘图：CH1 空腹 vs 餐后
+# Plot: CH1 fasting vs postprandial
 fig, ax = plt.subplots(figsize=(14, 5))
 x = np.arange(20)
 width = 0.35
@@ -106,7 +106,7 @@ plt.savefig('fig3_df_bar.png', dpi=150)
 plt.show()
 print('Figure 3 saved: fig3_df_bar.png')
 
-# ==================== 图4: t 检验汇总表 ====================
+# ==================== Figure 4: Summary table of t-test results ====================
 from scipy.stats import ttest_rel
 
 # All subjects
