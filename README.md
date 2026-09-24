@@ -1,6 +1,6 @@
 # EGG Analysis
 
-Python reproduction of electrogastrogram (EGG) analysis methods.
+Electrogastrogram (EGG) analysis methods.
 
 GitHub link: [https://github.com/chelsea12306/EGG_Analysis](https://github.com/chelsea12306/EGG_Analysis)
 
